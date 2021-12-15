@@ -1,1 +1,1 @@
-# HydroVinci : Projet MicroTransat
+# HydroVinci : Projet MicroTransat - Recherche
