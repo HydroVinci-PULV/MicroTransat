@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "8d91ad3e-7cb5-47a1-85ba-bcf531512358": {
+      "ProjectGuid": "8d91ad3e-7cb5-47a1-85ba-bcf531512358",
+      "DisplayName": "Telemetry",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}
