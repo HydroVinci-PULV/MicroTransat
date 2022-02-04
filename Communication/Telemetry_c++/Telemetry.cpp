@@ -11,6 +11,7 @@ using namespace std;
 char* compress(double lat, double lon);
 double* decompress(char* bin);
 
+
 int main()
 {
    decompress(compress(48.897, 2.236));

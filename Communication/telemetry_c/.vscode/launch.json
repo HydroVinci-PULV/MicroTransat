@@ -5,17 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "g++.exe - Générer et déboguer le fichier actif",
+            "name": "gcc.exe - Générer et déboguer le fichier actif",
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "c:/MinGW/bin",
             "environment": [],
             "externalConsole": false,
+            "internalConsoleOptions": "neverOpen",
             "MIMode": "gdb",
-            "miDebuggerPath": "C:\\ProgramData\\chocolatey\\bin\\gdb.exe",
+            "miDebuggerPath": "c:\\MinGW\\bin\\gdb.exe",
             "setupCommands": [
                 {
                     "description": "Activer l'impression en mode Pretty pour gdb",
@@ -23,7 +24,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "C/C++: g++.exe générer le fichier actif"
+            "preLaunchTask": "C/C++: gcc.exe générer le fichier actif"
         }
     ]
 }
