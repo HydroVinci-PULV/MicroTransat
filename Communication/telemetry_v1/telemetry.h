@@ -8,7 +8,7 @@
 #pragma region CONSTANTS
 
 // precision of the latitude and longitude
-#define PRECISION 3
+#define GPS_PRECISION 3
 
 // padding to add to the latitude to make it always positive
 #define LAT_PADDING 55000
@@ -28,12 +28,16 @@
 // mask to extract the last 2 bits of an int32
 #define MASK_DOS 0x00000003
 
+#define SPEED_PRECISION 2
+
 #pragma endregion
 
 #pragma region METHODS
 
-double *decompress(char *compressed);
-char *compress(double lat, double lon);
+double *decompressGPS(char *compressed);
+char *compressGPS(double lat, double lon);
+char* compressSpeed(double speed);
+double decompressSpeed(char *compressed);
 
 #pragma endregion
 

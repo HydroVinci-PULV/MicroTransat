@@ -1,24 +1,21 @@
 #include "telemetry.h"
 
 // uncomment when debugging
-// void main()
-// {
+void main()
+{
 
-//     double *coord = decompress(compress(47.419, -6.380));
-//     printf("%f %f\n", coord[0], coord[1]);
-// }
-
-
+    decompressSpeed(compressSpeed(21.52));
+}
 
 // function that compress GPS coordinates to a char array
-char *compress(double lat, double lon)
+char *compressGPS(double lat, double lon)
 {
     // init a byte array 5 bytes long to store the compressed data
     char *compressed = (char *)malloc(5);
 
     // convert lat and long to ints by multiplying by 10^precision
-    int lat_int = (int)(lat * pow(10, PRECISION));
-    int lon_int = (int)(lon * pow(10, PRECISION));
+    int lat_int = (int)(lat * pow(10, GPS_PRECISION));
+    int lon_int = (int)(lon * pow(10, GPS_PRECISION));
 
     // add padding to lat and long
     lat_int += LAT_PADDING;
@@ -62,7 +59,7 @@ char *compress(double lat, double lon)
 }
 
 // function that decompress a byte array to an array of doubles
-double *decompress(char *compressed)
+double *decompressGPS(char *compressed)
 {
     // init an array of doubles to store the decompressed data
     double *decompressed = (double *)malloc(2 * sizeof(double));
@@ -164,8 +161,90 @@ double *decompress(char *compressed)
     int lon_int = lon - LON_PADDING;
 
     // convert lat and long to double
-    decompressed[0] = (double)lat_int / pow(10, PRECISION);
-    decompressed[1] = (double)lon_int / pow(10, PRECISION);
-    
+    decompressed[0] = (double)lat_int / pow(10, GPS_PRECISION);
+    decompressed[1] = (double)lon_int / pow(10, GPS_PRECISION);
+
     return decompressed;
+}
+
+// function that compress boat speed to a byte array
+char *compressSpeed(double speed)
+{
+
+    // if speed is negative, set it to 0
+    if (speed < 0)
+    {
+        speed = 0;
+    }
+
+    // init a byte array 2 bytes long to store the compressed data
+    char *compressed = (char *)malloc(2);
+
+    if (speed < 9.92)
+    {
+        // convert speed to int
+        uint16_t speed_int = (uint16_t)speed * pow(10, SPEED_PRECISION);
+
+#ifdef DEBUG
+        printf("speed_int: ");
+        print_uint16_bits(speed_int);
+#endif
+
+        compressed[0] = (char)speed_int;
+        compressed[1] = (char)(speed_int >> 8);
+    }
+    else if (speed <= 40.92) // max speed transmissible with this method, safe enough
+    {
+        // convert speed to int without the decimal part
+        uint16_t speed_int = (uint16_t)(speed - 9.92);
+
+#ifdef DEBUG
+        printf("speed_int: ");
+        print_uint16_bits(speed_int);
+#endif
+
+        // recognizable pattern to indicate to the decoder that the speed is over 9.92 knots
+        uint16_t pattern = 0x03E0;
+
+        // add the pattern to the speed
+        speed_int = speed_int | pattern;
+
+#ifdef DEBUG
+        printf("speed_int: ");
+        print_uint16_bits(speed_int);
+#endif
+
+        compressed[0] = (char)speed_int;
+        compressed[1] = (char)(speed_int >> 8);
+    }
+    else
+    {
+        compressed[0] = 0;
+        compressed[1] = 0;
+    }
+
+#ifdef DEBUG
+    printf("compressed[0]: ");
+    print_bits(compressed[0]);
+    printf("compressed[1]: ");
+    print_bits(compressed[1]);
+#endif
+
+    return compressed;
+}
+
+// function that decompress boat speed from a byte array
+double decompressSpeed(char *compressed)
+{
+    double speed;
+
+    // compressed is a byte array 2 bytes long, convert it to an uint16_t
+    uint16_t speed_int = ((uint16_t)compressed[0] & MASK_FULL) | (((uint16_t)compressed[1] & MASK_FULL) << 8);
+
+#ifdef DEBUG
+    printf("speed_int: ");
+    print_uint16_bits(speed_int);
+#endif
+
+    return speed;
 }

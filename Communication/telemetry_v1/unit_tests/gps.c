@@ -26,10 +26,10 @@ void main()
             printf("lat: %f | lon: %f", lat, lon);
 
             // create a compressed string
-            char *compressed = compress(lat, lon);
+            char *compressed = compressGPS(lat, lon);
 
             // decompress the string
-            double *coord = decompress(compressed);
+            double *coord = decompressGPS(compressed);
 
             // check if the decompressed coordinates are the same as the original coordinates (with accuracy of 1e-3)
             if (fabs(lat - coord[0]) > 1e-3 || fabs(lon - coord[1]) > 1e-3)
@@ -50,10 +50,10 @@ void main()
             printf("lat: %f | lon: %f", lat, lon);
 
             // create a compressed string
-            char *compressed = compress(lat, lon);
+            char *compressed = compressGPS(lat, lon);
 
             // decompress the string
-            double *coord = decompress(compressed);
+            double *coord = decompressGPS(compressed);
 
             // check if the decompressed coordinates are the same as the original coordinates (with accuracy of 1e-3)
             if (fabs(lat - coord[0]) > 1e-3 || fabs(lon - coord[1]) > 1e-3)
