@@ -1,0 +1,51 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc.exe générer le fichier actif",
+            "command": "c:/MinGW/bin/gcc.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "${file}",
+                "${fileDirname}\\telemetry_utils.c"
+            ],
+            "options": {
+                "cwd": "c:/MinGW/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Tâche générée par le débogueur."
+        },
+        {
+            "type":"cppbuild",
+            "label":"build gps unit test",
+            "command":"c:/MinGW/bin/gcc.exe",
+            "args":[
+                "-fdiagnostics-color=always",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "${file}",
+                "${fileDirname}\\..\\telemetry.c",
+                "${fileDirname}\\..\\telemetry_utils.c",
+            ],
+            "options": {
+                "cwd": "c:/MinGW/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        }
+    ],
+    "version": "2.0.0"
+}
