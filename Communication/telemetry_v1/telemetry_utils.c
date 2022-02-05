@@ -23,6 +23,16 @@ void print_int_bits(int i)
     printf("\n");
 }
 
+// function that prints a char array as bits string
+void print_bits_array(char *c)
+{
+    int i;
+    for (i = 0; i < sizeof c; i++)
+    {
+        print_bits(c[i]);
+    }
+}
+
 void print_int32_bits(int32_t i)
 {
     int j;

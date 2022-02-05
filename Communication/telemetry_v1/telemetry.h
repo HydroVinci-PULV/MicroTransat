@@ -30,6 +30,11 @@
 
 #define SPEED_PRECISION 2
 
+// recognizable pattern to indicate to the decoder that the speed is over 9.92 knots
+#define SPEED_PATTERN 0x03E0
+
+#define SPEED_PATTERN_MASK 0x001F
+
 #pragma endregion
 
 #pragma region METHODS
@@ -38,6 +43,8 @@ double *decompressGPS(char *compressed);
 char *compressGPS(double lat, double lon);
 char* compressSpeed(double speed);
 double decompressSpeed(char *compressed);
+char *concatenate(char *compressed_gps, char *compressed_speed);
+char **expand(char *compressed);
 
 #pragma endregion
 

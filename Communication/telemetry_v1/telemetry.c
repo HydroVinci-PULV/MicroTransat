@@ -1,11 +1,14 @@
 #include "telemetry.h"
 
 // uncomment when debugging
-void main()
-{
-
-    decompressSpeed(compressSpeed(21.52));
-}
+// comment when unit testing
+// void main()
+// {
+//     char *compressed_gps = compressGPS(48.897,2.236);
+//     char *compressed_speed = compressSpeed(1.23);
+//     char *compressed = concatenate(compressed_gps, compressed_speed);
+//     expand(compressed);
+// }
 
 // function that compress GPS coordinates to a char array
 char *compressGPS(double lat, double lon)
@@ -171,9 +174,16 @@ double *decompressGPS(char *compressed)
 char *compressSpeed(double speed)
 {
 
+    #ifdef DEBUG
+        printf("speed: %f\n", speed);
+#endif
+
     // if speed is negative, set it to 0
     if (speed < 0)
     {
+#ifdef DEBUG
+        printf("speed negative\n");
+#endif
         speed = 0;
     }
 
@@ -183,7 +193,7 @@ char *compressSpeed(double speed)
     if (speed < 9.92)
     {
         // convert speed to int
-        uint16_t speed_int = (uint16_t)speed * pow(10, SPEED_PRECISION);
+        uint16_t speed_int = speed * pow(10, SPEED_PRECISION);
 
 #ifdef DEBUG
         printf("speed_int: ");
@@ -202,12 +212,8 @@ char *compressSpeed(double speed)
         printf("speed_int: ");
         print_uint16_bits(speed_int);
 #endif
-
-        // recognizable pattern to indicate to the decoder that the speed is over 9.92 knots
-        uint16_t pattern = 0x03E0;
-
         // add the pattern to the speed
-        speed_int = speed_int | pattern;
+        speed_int = speed_int | SPEED_PATTERN;
 
 #ifdef DEBUG
         printf("speed_int: ");
@@ -246,5 +252,89 @@ double decompressSpeed(char *compressed)
     print_uint16_bits(speed_int);
 #endif
 
+    // check if SPEED_PATTERN is present
+    if ((speed_int & SPEED_PATTERN) == SPEED_PATTERN)
+    {
+        // remove the pattern from the speed_int
+        speed_int &= SPEED_PATTERN_MASK;
+
+#ifdef DEBUG
+        printf("speed_int: ");
+        print_uint16_bits(speed_int);
+#endif
+
+        speed_int += 10;
+
+        speed = (double)speed_int;
+    }
+    else
+    {
+        speed = (double)speed_int / pow(10, SPEED_PRECISION);
+    }
+
     return speed;
+}
+
+// function that concatenate byte arrays from different compressors
+char *concatenate(char *compressed_gps, char *compressed_speed)
+{
+    // init a byte array to store the concatenated data
+    char *compressed = (char *)malloc(6);
+
+    // concatenate the compressed data
+    compressed[0] = compressed_gps[0];
+    compressed[1] = compressed_gps[1];
+    compressed[2] = compressed_gps[2];
+    compressed[3] = compressed_gps[3];
+    compressed[4] = (compressed_gps[4] & MASK_DOS) | ((compressed_speed[0] << 2) & 0xFC);
+    compressed[5] = ((compressed_speed[0] >> 6) & MASK_DOS) | ((compressed_speed[1] << 2) & 0xC);
+    #ifdef DEBUG
+    printf("concatenate: \n");
+    print_bits(compressed[0]);
+    print_bits(compressed[1]);
+    print_bits(compressed[2]);
+    print_bits(compressed[3]);
+    print_bits(compressed[4]);
+    print_bits(compressed[5]);
+    #endif
+
+    return compressed;
+}
+
+// function that expands a concatenated byte array to an array of char arrays
+char **expand(char *concatenated)
+{
+    // init an array of char arrays to store the expanded data
+    char **expanded = (char **)malloc(2 * sizeof(char *));
+
+    char *compressed_gps = (char *)malloc(5);
+    char *compressed_speed = (char *)malloc(2);
+
+    // copy the compressed data to the char arrays
+    compressed_gps[0] = concatenated[0];
+    compressed_gps[1] = concatenated[1];
+    compressed_gps[2] = concatenated[2];
+    compressed_gps[3] = concatenated[3];
+    compressed_gps[4] = concatenated[4] & MASK_DOS;
+
+    compressed_speed[0] = ((concatenated[4] >> 2) & 0x3F) | ((concatenated[5] << 6) & 0xC0);
+    compressed_speed[1] = (concatenated[5] >> 2) & MASK_DOS;
+
+    #ifdef DEBUG
+    printf("gps: \n");
+    print_bits(compressed_gps[0]);
+    print_bits(compressed_gps[1]);
+    print_bits(compressed_gps[2]);
+    print_bits(compressed_gps[3]);
+    print_bits(compressed_gps[4]);
+
+    printf("speed: \n");
+    print_bits(compressed_speed[0]);
+    print_bits(compressed_speed[1]);
+    #endif
+
+    expanded[0] = compressed_gps;
+    expanded[1] = compressed_speed;
+
+    return expanded;
 }

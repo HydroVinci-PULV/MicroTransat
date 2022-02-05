@@ -4,6 +4,7 @@
 #pragma region PRINT_BITS_BY_BITS_METHODS_DECLARATION
 
 void print_bits(char c);
+void print_bits_array(char *c);
 void print_int_bits(int i);
 void print_int32_bits(int i);
 void print_uint8_bits(uint8_t i);
