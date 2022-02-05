@@ -1,5 +1,6 @@
 #include "telemetry.h"
 
+// uncomment when debugging
 // void main()
 // {
 
