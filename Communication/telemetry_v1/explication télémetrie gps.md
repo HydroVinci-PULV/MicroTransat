@@ -31,11 +31,11 @@ On a donc les intervals suivants:
 - latitude : [-55, 74]
 - longitude : [-98, 8]
 
-A ce niveau de précision (10<sup>-3</sup>) la latitude peut donc être convertie en un entier appartenant à l'interval [-55000, 74000] soit 129000 possibilités et la longitude en un entier appartenant à l'interval [-98000, 8000] soit 106000 possibilités.
+A ce niveau de précision (10<sup>-3</sup>) la latitude peut donc être convertie en un entier appartenant à l'interval [-550000, 740000] soit 1 290 000 possibilités et la longitude en un entier appartenant à l'interval [-980000, 80000] soit 1 060 000 possibilités.
 
-Pour stocker un entier compris entre 0 et 129000 (on va ajouter un padding à notre valeur pour qu'elle soit toujours positive) on a besoin de 17 bits. Pareil pour les 106000 possibilités de longitude.
+Pour stocker un entier compris entre 0 et 1290000 (on va ajouter un padding à notre valeur pour qu'elle soit toujours positive) on a besoin de 20 bits. Pareil pour les 1060000 possibilités de longitude.
 
-On a donc pour but de caser ces 34 bits dans des octets (8 bits) :
+On a donc pour but de caser ces 40 bits dans des octets (8 bits) :
 
 Un simple calcul nous indique qu'il nous faudra 5 octets pour stocker (avec beaucoup de marge malheureusement) les coordonnées GPS.
 
