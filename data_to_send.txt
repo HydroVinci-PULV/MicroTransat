@@ -1,0 +1,22 @@
+GPS
+Speed
+average speed since last data
+heading
+
+# Batteries
+Main : voltage
+Main : cycle
+
+Secondary : voltage
+Secondary : cycle
+
+# Solar panel
+average voltage since last data
+
+# Inside of the boat
+temperature
+humidity
+pressure
+
+# outside
+water temperature
