@@ -291,7 +291,7 @@ char *compressHeading(double heading)
 
 double decompressHeading(char *compressed)
 {
-    double heading = 
+    double heading = ((uint16_t)compressed[0] & MASK_FULL) | (((uint16_t)compressed[1] & MASK_FULL) << 8);
 }
 
 // function that concatenate byte arrays from different compressors
