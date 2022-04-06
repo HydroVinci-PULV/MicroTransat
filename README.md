@@ -14,4 +14,4 @@ Cette présentation de l'architecture est amenée à évoluer en fonction des be
 
 <p>Considérant que notre bateau autonomme puisse être apparenté à un drone, nous avons fait le choix d'utiliser un <i>flight controller</i> comme ordinateur de bord. C'est pourquoi nous utilisons au sein de notre architecture de navigation un <i>BeagleBone Blue</i> choisit pour sa compatibilité avec <a href="https://ardupilot.org/"><img src="assets/ardupilot_logo.png" height="11px"></a>.</p>
 
-Vous trouverez plus d'information sur le *BeagleBone Blue* sur [la page dédiée](wiki/BeagleBone-Blue) dans le wiki du projet.
+Vous trouverez plus d'information sur le *BeagleBone Blue* sur [la page dédiée](../../wiki/BeagleBone-Blue) dans le wiki du projet.
