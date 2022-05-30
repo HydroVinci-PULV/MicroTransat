@@ -1,20 +1,43 @@
 const GeneticAlgorithm = require("./geneticAlgorithm.js");
 const fs=require("fs");
 const prompt = require("prompt-sync")({ sigint: true });
+const { SerialPort } = require('serialport');
+const GPS = require('gps');
+const { DelimiterParser } = require('@serialport/parser-delimiter')
 
 function distance(a, b) {
     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
 }
 
-// var latStart = prompt("Point de départ - latitude : ");
-// var longStart = prompt("Point de départ - longitude : ");
-// var latEnd = prompt("Point d'arrivée - latitude : ");
-// var longEnd = prompt("Point d'arrivée - longitude : ");
+var latStart = prompt("Point de départ - latitude : ");
+var longStart = prompt("Point de départ - longitude : ");
+var latEnd = prompt("Point d'arrivée - latitude : ");
+var longEnd = prompt("Point d'arrivée - longitude : ");
 
-var latStart = 48.891123;
-var longStart = 2.225268;
-var latEnd = 48.894442;
-var longEnd = 2.216091;
+// const port = new SerialPort({
+//     path: '/dev/ttyACM0',
+//     baudRate: 9600,
+//   });
+
+//   const parser = port.pipe(new DelimiterParser({ delimiter: '\r\n' }))
+
+//   const gps = new GPS;
+
+//   parser.on('data', data => {
+//     gps.update(data.toString());
+//   });
+
+//   gps.on('data', data => {
+//     console.log(data, gps.state);
+//   });
+
+//   console.log(gps.state);
+
+//   get current position
+// var latStart = 48.891123;
+// var longStart = 2.225268;
+// var latEnd = 48.894442;
+// var longEnd = 2.216091;
 
 class Navigator {
     constructor() {
