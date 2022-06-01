@@ -1,4 +1,4 @@
-const Boat=require("./Boat.js");
+const Boat=require("./boat.js");
 const noise =require("./perlin.js").noise;
 noise.seed(-1201.2);
 const {Vector,CartesianVector,PolarVector}=require("./vector.js");

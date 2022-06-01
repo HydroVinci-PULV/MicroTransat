@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@serialport/parser-delimiter": "^10.3.0",
+    "gps": "^0.6.1",
+    "prompt-sync": "^4.2.0",
+    "serialport": "^10.4.0"
+  }
+}
