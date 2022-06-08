@@ -1,1 +1,1 @@
-/home/antoine/Git/HydroVinci-MicroTransat/Télémetrie/target/debug/telemetry: /home/antoine/Git/HydroVinci-MicroTransat/Télémetrie/src/main.rs /home/antoine/Git/HydroVinci-MicroTransat/Télémetrie/src/utils.rs
+/mnt/storage/Github/MicroTransat/Télémetrie/target/debug/telemetry: /mnt/storage/Github/MicroTransat/Télémetrie/src/main.rs /mnt/storage/Github/MicroTransat/Télémetrie/src/utils.rs
