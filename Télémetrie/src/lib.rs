@@ -1,23 +1,6 @@
-mod utils;
+use std::cmp::min;
 
-fn main() {
-    let lat = compress(48.897, 20, -55.0, 74.0);
-    let lon = compress(2.236, 20, -98.0, 8.0);
-    // let lat = compress(74.0, 20, -55.0, 74.0);
-    // let lon = compress(8.0, 20, -98.0, 8.0);
-    let mut bytes: Vec<Vec<u8>> = Vec::with_capacity(2);
-    bytes.push(lat);
-    bytes.push(lon);
-    let bits: Vec<u8> = vec![20; 2];
-    let concated = concat_bytes(&bytes, &bits);
-    let splitted = split_bytes(&concated, &bits);
-    let lat2 = &splitted[0];
-    let lon2 = &splitted[1];
-    let final_lat = decompress(lat2, 20, -55.0, 74.0);
-    let final_lon = decompress(lon2, 20, -98.0, 8.0);
-    println!("{}", final_lat);
-    println!("{}", final_lon);
-}
+mod utils;
 
 /// **Compress a double to a desired bits sized vector of bytes**
 ///
@@ -28,7 +11,9 @@ fn main() {
 /// and figure out the precision of the double to fit in the max bit size and return a bytes array
 ///
 /// Return a vector of bytes
-fn compress(value: f64, max_bit_size: u8, start: f64, end: f64) -> Vec<u8> {
+pub fn compress(value: f64, max_bit_size: u8, start: f64, end: f64) -> Vec<u8> {
+    #[cfg(debug_assertions)]
+    println!("Compress start");
     #[cfg(debug_assertions)]
     println!("compress({}, {}, {}, {})", value, max_bit_size, start, end);
     // number of possible values for the double
@@ -36,7 +21,7 @@ fn compress(value: f64, max_bit_size: u8, start: f64, end: f64) -> Vec<u8> {
     #[cfg(debug_assertions)]
     println!("n_possible_values: {}", n_possible_values);
     // precision of the double
-    let precision = (end - start) / n_possible_values as f64;
+    let precision = (end - start).abs() / n_possible_values as f64;
     #[cfg(debug_assertions)]
     println!("precision = {}", precision);
     // number of bytes to store the max_bit_size bits
@@ -55,43 +40,38 @@ fn compress(value: f64, max_bit_size: u8, start: f64, end: f64) -> Vec<u8> {
     if remainder != 0.0 {
         // if remainder is inferior to step/2, we need to substract the remainder to the value
         if remainder < precision / 2.0 {
-            w_value = w_value - remainder;
+            w_value -= remainder;
         } else {
             // else we need to add the remainder to the value
-            w_value = w_value + (precision - remainder);
+            w_value += precision - remainder;
         }
     }
     #[cfg(debug_assertions)]
     println!("w_value = {}", w_value);
-    let mut pos = (w_value / precision) as u64;
-    // if pos > n_possible_values-1, we need to set it to n_possible_values-1
-    if pos > n_possible_values - 1 {
-        pos = n_possible_values - 1;
-    }
+    let mut pos = min((w_value / precision) as u64, n_possible_values - 1);
     #[cfg(debug_assertions)]
     println!("pos = {}", pos);
-    // keep only the max_bit_size bits
-    let mask = 2u64.pow((max_bit_size) as u32) - 1;
-    #[cfg(debug_assertions)]
-    println!("mask = {}", mask);
-    // let pos_masked = pos & mask;
-    let pos_masked = pos;
-    #[cfg(debug_assertions)]
-    println!("pos_masked = {}", pos_masked);
     // convert the masked value to bytes
-    for i in 0..n_required_bytes {
-        let byte = (pos_masked >> (8 * (n_required_bytes - 1 - i))) as u8;
+    #[cfg(debug_assertions)]
+    println!("byte = {}", pos as u8);
+    bytes.push(pos as u8);
+    for _i in 1..n_required_bytes {
+        pos >>= 8;
         #[cfg(debug_assertions)]
-        println!("byte = {}", byte);
-        bytes.push(byte);
+        println!("byte = {}", pos as u8);
+        bytes.push(pos as u8);
     }
     // invert vector
     bytes.reverse();
 
     #[cfg(debug_assertions)]
     utils::print_bytes(&bytes);
+    #[cfg(debug_assertions)]
+    println!("Compress end\n");
 
-    return bytes;
+    bytes
+
+
 }
 
 /// **Decompress a vector of bytes to a double**
@@ -102,7 +82,7 @@ fn compress(value: f64, max_bit_size: u8, start: f64, end: f64) -> Vec<u8> {
 /// - range of the double
 ///
 /// Return a double
-fn decompress(bytes: &Vec<u8>, max_bit_size: u8, start: f64, end: f64) -> f64 {
+pub fn decompress(bytes: &Vec<u8>, max_bit_size: u8, start: f64, end: f64) -> f64 {
     #[cfg(debug_assertions)]
     println!(
         "decompress({:?}, {}, {}, {})",
@@ -137,7 +117,8 @@ fn decompress(bytes: &Vec<u8>, max_bit_size: u8, start: f64, end: f64) -> f64 {
     #[cfg(debug_assertions)]
     println!("w_value = {}", w_value);
 
-    return w_value;
+    w_value
+
 }
 
 /// **concatenate multiple vectors of bytes**
@@ -147,11 +128,12 @@ fn decompress(bytes: &Vec<u8>, max_bit_size: u8, start: f64, end: f64) -> f64 {
 /// - a vector of bits sizes
 ///
 /// Return a vector of bytes
-fn concat_bytes(vec_bytes: &Vec<Vec<u8>>, bits_sizes: &Vec<u8>) -> Vec<u8> {
+pub fn concat_bytes(vec_bytes: &mut Vec<Vec<u8>>, bits_sizes: &Vec<u8>) -> Vec<u8> {
     // convert vec_bytes into a vector of bool
     let mut vec_bool: Vec<bool> = Vec::new();
     for i in 0..vec_bytes.len() {
-        let bytes = &vec_bytes[i as usize];
+        let bytes = &mut vec_bytes[i as usize];
+        bytes.reverse();
         let bits = bits_sizes[i as usize];
         let mut bools: Vec<bool> = Vec::new();
         for j in 0..bytes.len() {
@@ -167,7 +149,7 @@ fn concat_bytes(vec_bytes: &Vec<Vec<u8>>, bits_sizes: &Vec<u8>) -> Vec<u8> {
     }
     // convert the vector of bool into a vector of bytes
     let mut w_bytes: Vec<u8> = Vec::new();
-    while vec_bool.len() > 0 {
+    while !vec_bool.is_empty() {
         // take the first 8 bits of the vector of bool
         let mut bools: Vec<bool> = Vec::new();
         for _ in 0..8 {
@@ -181,7 +163,8 @@ fn concat_bytes(vec_bytes: &Vec<Vec<u8>>, bits_sizes: &Vec<u8>) -> Vec<u8> {
     #[cfg(debug_assertions)]
     utils::print_bytes(&w_bytes);
 
-    return w_bytes;
+    w_bytes
+
 }
 
 /// **Split a vector of bytes into multiple vectors of bytes**
@@ -191,7 +174,7 @@ fn concat_bytes(vec_bytes: &Vec<Vec<u8>>, bits_sizes: &Vec<u8>) -> Vec<u8> {
 /// - a vector of bits sizes
 ///
 /// Return a vector of vectors of bytes
-fn split_bytes(bytes: &Vec<u8>, bits_sizes: &Vec<u8>) -> Vec<Vec<u8>> {
+pub fn split_bytes(bytes: &Vec<u8>, bits_sizes: &Vec<u8>) -> Vec<Vec<u8>> {
     #[cfg(debug_assertions)]
     println!("split_bytes({:?}, {:?})", bytes, bits_sizes);
     // convert bytes into a vector of bool
@@ -215,11 +198,12 @@ fn split_bytes(bytes: &Vec<u8>, bits_sizes: &Vec<u8>) -> Vec<Vec<u8>> {
     for vec_bool in vec_vec_bool {
         let mut vec_bool = vec_bool.clone();
         let mut w_bytes: Vec<u8> = Vec::new();
-        while vec_bool.len() > 0 {
+        while !vec_bool.is_empty() {
             // take the first 8 bits of the vector of bool
             let mut bools: Vec<bool> = Vec::new();
-            for _ in 0..8 {
-                if vec_bool.len() == 0 {
+            for i in 0..8 {
+                if vec_bool.is_empty(){
+                    bools.extend(vec![false;8-i]);
                     break;
                 }
                 bools.push(vec_bool.remove(0));
@@ -228,25 +212,31 @@ fn split_bytes(bytes: &Vec<u8>, bits_sizes: &Vec<u8>) -> Vec<Vec<u8>> {
             let byte = utils::bool_vec_to_byte(bools);
             w_bytes.push(byte);
         }
+        w_bytes.reverse();
         vec_bytes.push(w_bytes);
     }
 
     #[cfg(debug_assertions)]
     for vec_bytes in &vec_bytes {
-        utils::print_bytes(&vec_bytes);
+        utils::print_bytes(vec_bytes);
     }
 
-    return vec_bytes;
+    vec_bytes
 
 }
 
+pub fn hamming_code(bytes: &Vec<u8>) {
+    
+}
+
+
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
     use rand::Rng;
 
     #[test]
-    fn test_compress_decompress() {
+    pub fn test_compress_decompress() {
         // generate random double range
         let start = rand::thread_rng().gen_range(-1000..1000);
         let end = rand::thread_rng().gen_range(start..(start + 1000));
@@ -270,7 +260,7 @@ mod tests {
     }
 
     #[test]
-    fn test_heading_compress_decompress() {
+    pub fn test_heading_compress_decompress() {
         // generate random double range
         let start = 0;
         let end = 3600;
@@ -287,7 +277,7 @@ mod tests {
     }
 
     #[test]
-    fn test_voltage_compress_decompress() {
+    pub fn test_voltage_compress_decompress() {
         // generate random double range
         let start = 0;
         let end = 5000;
@@ -303,7 +293,7 @@ mod tests {
     }
 
     #[test]
-    fn test_humidity_compress_decompress() {
+    pub fn test_humidity_compress_decompress() {
         // generate random double range
         let start = 0;
         let end = 10000;
@@ -319,7 +309,7 @@ mod tests {
     }
 
     #[test]
-    fn test_inondation_compress_decompress() {
+    pub fn test_inondation_compress_decompress() {
         // generate random double range
         let start = 0;
         let end = 8;
@@ -335,7 +325,7 @@ mod tests {
     }
 
     #[test]
-    fn test_gps_quality_compress_decompress() {
+    pub fn test_gps_quality_compress_decompress() {
         // generate random double range
         let start = 0;
         let end = 4;
@@ -351,7 +341,7 @@ mod tests {
     }
 
     #[test]
-    fn test_ping_compress_decompress() {
+    pub fn test_ping_compress_decompress() {
         // generate random double range
         let start = 0;
         let end = 1;
@@ -365,4 +355,36 @@ mod tests {
             assert!(value3 == value);
         }
     }
+
+    #[test]
+    pub fn test_concat_split() {
+        let start = rand::thread_rng().gen_range(-1000..1000);
+        let end = rand::thread_rng().gen_range(start..(start + 1000));
+        let value1 = rand::thread_rng().gen_range(start..end) as f64;
+        let value2 = rand::thread_rng().gen_range(start..end) as f64;
+        let size = 20;
+
+        let bytes1 = compress(value1, size, start as f64, end as f64);
+        let bytes2 = compress(value2, size, start as f64, end as f64);
+
+        #[cfg(debug_assertions)]
+        {
+            println!("\n");
+            utils::print_bytes(&bytes1);
+            utils::print_bytes(&bytes2);
+            println!("\n");
+        }
+
+        let concat = concat_bytes(&mut vec![bytes1, bytes2], &vec![size, size]);
+        let split = split_bytes(&concat, &vec![size, size]);
+
+        let res1 = decompress(&split[0], size, start as f64, end as f64);
+        let res2 = decompress(&split[1], size, start as f64, end as f64);
+
+        let precision = (end - start) as f64 / (2u64.pow(20) as f64);
+
+        assert!(res1 <= value1 + precision && res1 >= value1 - precision);
+        assert!(res2 <= value2 + precision && res2 >= value2 - precision);
+    }
+
 }
