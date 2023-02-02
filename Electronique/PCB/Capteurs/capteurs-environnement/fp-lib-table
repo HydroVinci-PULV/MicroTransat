@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name "Adafruit MS8607")(type "KiCad")(uri "/home/kali/Github/MicroTransat/Electronique/PCB/Capteurs/ms8607/Adafruit MS8607.pretty")(options "")(descr ""))
+)
