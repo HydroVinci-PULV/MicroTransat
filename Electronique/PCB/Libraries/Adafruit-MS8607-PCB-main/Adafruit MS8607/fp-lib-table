@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "Adafruit MS8607")(type "KiCad")(uri "$(KIPRJMOD)/Adafruit MS8607.pretty")(options "")(descr ""))
+)
