@@ -68,7 +68,7 @@
     "zone_display_mode": 0
   },
   "meta": {
-    "filename": "ttl-to-rs485.kicad_prl",
+    "filename": "ttl-to-rs485-proto.kicad_prl",
     "version": 3
   },
   "project": {

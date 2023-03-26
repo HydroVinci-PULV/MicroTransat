@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "ttl-to-rs485")(type "KiCad")(uri "D:/Github/MicroTransat/Electronique/PCB/Capteurs/ttl-to-rs485/ttl-to-rs485/ttl-to-rs485.kicad_sym")(options "")(descr ""))
+)
